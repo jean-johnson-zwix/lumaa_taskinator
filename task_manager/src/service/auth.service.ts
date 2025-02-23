@@ -42,12 +42,16 @@ export class AuthService {
     }
   }
 
-  async registerUser(user: User): Promise<UserEntity> {
+  async registerUser(user: User){
     try {
       const hashedPassword = await hashPassword(user.password);
       user.password = hashedPassword;
       const userEntity = await this.userRepository.create(user);
-      return await this.userRepository.save(userEntity);
+      await this.userRepository.save(userEntity);
+      return {
+        id: user.id,
+        userName: user.userName
+      }
     } catch (err) {
       if (err.code == 23505) {
         this.logger.error(err.message, err.stack);
