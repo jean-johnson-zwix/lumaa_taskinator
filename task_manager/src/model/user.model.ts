@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsBoolean, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
-
+import { Exclude } from 'class-transformer';
 
 export class User {
 

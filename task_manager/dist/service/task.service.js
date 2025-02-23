@@ -37,14 +37,26 @@ let TaskService = class TaskService {
     }
     async createTask(task) {
         try {
-            const user = await this.userRepository.findOneBy({
-                userName: task.userName,
-            });
             const taskEntity = await this.taskRepository.create(task);
-            taskEntity.user = user;
-            return this.mapToModel(await this.taskRepository.save(taskEntity));
+            if (task.userName) {
+                const user = await this.userRepository.findOneBy({
+                    userName: task.userName,
+                });
+                if (!user) {
+                    throw new common_1.BadRequestException(`There is no user with username: ${task.userName}`);
+                }
+                else {
+                    taskEntity.user = user;
+                }
+            }
+            await this.taskRepository.save(taskEntity);
+            console.log(taskEntity);
+            return this.mapToModel(taskEntity);
         }
         catch (err) {
+            if (err instanceof common_1.BadRequestException) {
+                throw err;
+            }
             if (err.code == 23505) {
                 this.logger.error(err.message, err.stack);
                 throw new common_1.HttpException('Duplicate Task', common_1.HttpStatus.CONFLICT);
@@ -59,14 +71,32 @@ let TaskService = class TaskService {
                 where: { id },
                 relations: ['user'],
             });
+            console.log('line 82', existingTask);
             if (!existingTask) {
                 throw new common_1.HttpException('Task does not exist', 404);
             }
             const updatedTask = this.taskRepository.merge(existingTask, task);
-            return this.mapToModel(await this.taskRepository.save(updatedTask));
+            console.log('line 87', updatedTask);
+            if (task.userName && task.userName != updatedTask.user.userName) {
+                const user = await this.userRepository.findOneBy({
+                    userName: task.userName,
+                });
+                if (!user) {
+                    throw new common_1.BadRequestException(`There is no user with username: ${task.userName}`);
+                }
+                else {
+                    updatedTask.user = user;
+                }
+            }
+            console.log(updatedTask);
+            await this.taskRepository.save(updatedTask);
+            return this.mapToModel(updatedTask);
         }
         catch (err) {
             if (err instanceof common_1.HttpException) {
+                throw err;
+            }
+            else if (err instanceof common_1.BadRequestException) {
                 throw err;
             }
             this.logger.error(err.message, err.stack);
