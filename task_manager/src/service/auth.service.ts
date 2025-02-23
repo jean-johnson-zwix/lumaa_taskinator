@@ -1,6 +1,6 @@
 import {
   Injectable,
-  NotFoundException,
+  BadRequestException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserEntity } from 'src/entity/user.entity';
@@ -19,7 +19,6 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class AuthService {
   private userRepository;
-  //private jwtService;
   private logger = new Logger();
 
   constructor(
@@ -31,7 +30,7 @@ export class AuthService {
 
   authenticate(authHeader: string) {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new Error('Unauthorized: No token provided');
+      throw new UnauthorizedException('No token provided');
     }
     const token = authHeader.split(' ')[1];
     try {
@@ -52,7 +51,7 @@ export class AuthService {
     } catch (err) {
       if (err.code == 23505) {
         this.logger.error(err.message, err.stack);
-        throw new HttpException('Username already exists', HttpStatus.CONFLICT);
+        throw new HttpException('Username is not available', HttpStatus.CONFLICT);
       }
       this.logger.error(err.message, err.stack);
       throw new InternalServerErrorException(
@@ -66,7 +65,7 @@ export class AuthService {
       const userName = user.userName;
       const userEntity = await this.userRepository.findOneBy({ userName });
       if (userEntity == null) {
-        throw new HttpException('User not found', 404);
+        throw new BadRequestException('User does not exist');
       }
       if (await verifyPassword(user.password, userEntity.password)) {
         const payload = {
@@ -76,16 +75,17 @@ export class AuthService {
         const accessToken = this.jwtService.sign(payload);
         return new AuthResponse(accessToken, user.userName, userEntity.id);
       } else {
-        throw new HttpException(
-          'Incorrect username or password',
-          HttpStatus.UNAUTHORIZED,
-        );
+        throw new UnauthorizedException('The password is incorrect');
       }
     } catch (err) {
-      this.logger.error(err.message, err.stack);
-      throw new InternalServerErrorException(
-        'Something went wrong, Try again!',
-      );
+      if (err instanceof UnauthorizedException) {
+        throw err;
+      } else {
+        this.logger.error(err.message, err.stack);
+        throw new InternalServerErrorException(
+          'Something went wrong, Try again!',
+        );
+      }
     }
   }
 }

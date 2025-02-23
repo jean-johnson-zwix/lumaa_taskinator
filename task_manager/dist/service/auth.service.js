@@ -29,7 +29,7 @@ let AuthService = class AuthService {
     }
     authenticate(authHeader) {
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            throw new Error('Unauthorized: No token provided');
+            throw new common_1.UnauthorizedException('No token provided');
         }
         const token = authHeader.split(' ')[1];
         try {
@@ -51,7 +51,7 @@ let AuthService = class AuthService {
         catch (err) {
             if (err.code == 23505) {
                 this.logger.error(err.message, err.stack);
-                throw new common_2.HttpException('Username already exists', common_2.HttpStatus.CONFLICT);
+                throw new common_2.HttpException('Username is not available', common_2.HttpStatus.CONFLICT);
             }
             this.logger.error(err.message, err.stack);
             throw new common_2.InternalServerErrorException('Something went wrong, Try again!');
@@ -62,7 +62,7 @@ let AuthService = class AuthService {
             const userName = user.userName;
             const userEntity = await this.userRepository.findOneBy({ userName });
             if (userEntity == null) {
-                throw new common_2.HttpException('User not found', 404);
+                throw new common_1.BadRequestException('User does not exist');
             }
             if (await (0, auth_util_1.verifyPassword)(user.password, userEntity.password)) {
                 const payload = {
@@ -73,12 +73,17 @@ let AuthService = class AuthService {
                 return new auth_response_model_1.AuthResponse(accessToken, user.userName, userEntity.id);
             }
             else {
-                throw new common_2.HttpException('Incorrect username or password', common_2.HttpStatus.UNAUTHORIZED);
+                throw new common_1.UnauthorizedException('The password is incorrect');
             }
         }
         catch (err) {
-            this.logger.error(err.message, err.stack);
-            throw new common_2.InternalServerErrorException('Something went wrong, Try again!');
+            if (err instanceof common_1.UnauthorizedException) {
+                throw err;
+            }
+            else {
+                this.logger.error(err.message, err.stack);
+                throw new common_2.InternalServerErrorException('Something went wrong, Try again!');
+            }
         }
     }
 };

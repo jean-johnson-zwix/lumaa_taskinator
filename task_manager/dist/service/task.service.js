@@ -29,7 +29,9 @@ let TaskService = class TaskService {
         return new task_model_1.Task(taskEntity.id, taskEntity.title, taskEntity.description, taskEntity.isComplete, taskEntity.user.userName);
     }
     async getAllTasks() {
-        const taskEntityList = await this.taskRepository.find({ relations: ['user'] });
+        const taskEntityList = await this.taskRepository.find({
+            relations: ['user'],
+        });
         const taskList = taskEntityList.map((task) => this.mapToModel(task));
         return taskList;
     }
@@ -55,9 +57,8 @@ let TaskService = class TaskService {
         try {
             const existingTask = await this.taskRepository.findOne({
                 where: { id },
-                relations: ['user']
+                relations: ['user'],
             });
-            this.logger.log(existingTask);
             if (!existingTask) {
                 throw new common_1.HttpException('Task does not exist', 404);
             }
@@ -65,6 +66,9 @@ let TaskService = class TaskService {
             return this.mapToModel(await this.taskRepository.save(updatedTask));
         }
         catch (err) {
+            if (err instanceof common_1.HttpException) {
+                throw err;
+            }
             this.logger.error(err.message, err.stack);
             throw new common_1.InternalServerErrorException('Something went wrong, Try again!');
         }

@@ -28,18 +28,16 @@ export class TaskService {
       taskEntity.description,
       taskEntity.isComplete,
       taskEntity.user.userName,
-    )
+    );
   }
 
   async getAllTasks(): Promise<Task[]> {
-    const taskEntityList = await this.taskRepository.find({relations: ['user']});
-    const taskList = taskEntityList.map(
-      (task) => this.mapToModel(task),
-    );
+    const taskEntityList = await this.taskRepository.find({
+      relations: ['user'],
+    });
+    const taskList = taskEntityList.map((task) => this.mapToModel(task));
     return taskList;
   }
-
-
 
   async createTask(task: Task): Promise<Task> {
     try {
@@ -63,17 +61,19 @@ export class TaskService {
 
   async updateTask(id: number, task: Task): Promise<Task> {
     try {
-      const existingTask = await this.taskRepository.findOne({ 
+      const existingTask = await this.taskRepository.findOne({
         where: { id },
-        relations: ['user']
-       });
-      this.logger.log(existingTask)
-    if (!existingTask) {
-      throw new HttpException('Task does not exist', 404);
-    }
+        relations: ['user'],
+      });
+      if (!existingTask) {
+        throw new HttpException('Task does not exist', 404);
+      }
       const updatedTask = this.taskRepository.merge(existingTask, task);
       return this.mapToModel(await this.taskRepository.save(updatedTask));
     } catch (err) {
+      if (err instanceof HttpException) {
+        throw err;
+      }
       this.logger.error(err.message, err.stack);
       throw new InternalServerErrorException(
         'Something went wrong, Try again!',
