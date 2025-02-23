@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthResponse = void 0;
 class AuthResponse {
-    constructor(authStatus, userName, userId) {
-        this.authStatus = authStatus;
+    constructor(accessToken, userName, userId) {
+        this.accessToken = accessToken;
         this.userName = userName;
         this.userId = userId;
     }
-    authStatus;
+    accessToken;
     userName;
     userId;
 }

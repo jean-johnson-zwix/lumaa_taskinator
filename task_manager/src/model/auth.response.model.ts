@@ -1,13 +1,13 @@
 
 export class AuthResponse {
 
-    constructor(authStatus: string, userName: string, userId: number) {
-        this.authStatus = authStatus;
+    constructor(accessToken: string, userName: string, userId: number) {
+        this.accessToken = accessToken;
         this.userName = userName;
         this.userId = userId;
     }
     
-    authStatus: string;
+    accessToken: string;
     userName: string;
     userId: number;
     

@@ -1,6 +1,6 @@
 export declare class AuthResponse {
-    constructor(authStatus: string, userName: string, userId: number);
-    authStatus: string;
+    constructor(accessToken: string, userName: string, userId: number);
+    accessToken: string;
     userName: string;
     userId: number;
 }

@@ -15,12 +15,21 @@ const datasource_module_1 = require("./datasource/datasource.module");
 const task_service_1 = require("./service/task.service");
 const auth_service_1 = require("./service/auth.service");
 const auth_controller_1 = require("./controller/auth.controller");
+const jwt_1 = require("@nestjs/jwt");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [datasource_module_1.TypeOrmModule],
+        imports: [datasource_module_1.TypeOrmModule,
+            config_1.ConfigModule.forRoot(),
+            jwt_1.JwtModule.register({
+                global: true,
+                secret: process.env.JWT_SECRET,
+                signOptions: { expiresIn: '60s' },
+            }),
+        ],
         controllers: [app_controller_1.AppController, task_controller_1.TaskController, auth_controller_1.AuthController],
         providers: [app_service_1.AppService, auth_service_1.AuthService, task_service_1.TaskService],
     })

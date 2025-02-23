@@ -16,55 +16,66 @@ exports.TaskController = void 0;
 const common_1 = require("@nestjs/common");
 const task_service_1 = require("../service/task.service");
 const task_model_1 = require("../model/task.model");
+const auth_service_1 = require("../service/auth.service");
 let TaskController = class TaskController {
     taskService;
-    constructor(taskService) {
+    authService;
+    constructor(taskService, authService) {
         this.taskService = taskService;
+        this.authService = authService;
     }
-    async getAllTasks() {
+    async getAllTasks(authHeader) {
+        this.authService.authenticate(authHeader);
         return await this.taskService.getAllTasks();
     }
-    async createTask(task) {
+    async createTask(authHeader, task) {
+        this.authService.authenticate(authHeader);
         return await this.taskService.createTask(task);
     }
-    async updateTask(id, task) {
+    async updateTask(authHeader, id, task) {
+        this.authService.authenticate(authHeader);
         return await this.taskService.updateTask(id, task);
     }
-    async deleteTask(id) {
+    async deleteTask(authHeader, id) {
+        this.authService.authenticate(authHeader);
         return await this.taskService.removeTask(id);
     }
 };
 exports.TaskController = TaskController;
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Headers)('authorization')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "getAllTasks", null);
 __decorate([
     (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Headers)('authorization')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [task_model_1.Task]),
+    __metadata("design:paramtypes", [String, task_model_1.Task]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "createTask", null);
 __decorate([
     (0, common_1.Put)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    __param(0, (0, common_1.Headers)('authorization')),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, task_model_1.Task]),
+    __metadata("design:paramtypes", [String, Number, task_model_1.Task]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "updateTask", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Headers)('authorization')),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [String, Number]),
     __metadata("design:returntype", Promise)
 ], TaskController.prototype, "deleteTask", null);
 exports.TaskController = TaskController = __decorate([
     (0, common_1.Controller)('tasks'),
-    __metadata("design:paramtypes", [task_service_1.TaskService])
+    __metadata("design:paramtypes", [task_service_1.TaskService, auth_service_1.AuthService])
 ], TaskController);
 //# sourceMappingURL=task.controller.js.map
