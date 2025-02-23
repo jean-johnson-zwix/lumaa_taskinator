@@ -47,6 +47,7 @@ export class TaskService {
         const user = await this.userRepository.findOneBy({
           userName: task.userName,
         });
+        console.log(user)
         if (!user) {
           throw new BadRequestException(
             `There is no user with username: ${task.userName}`,

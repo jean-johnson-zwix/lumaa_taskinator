@@ -47,10 +47,10 @@ export class AuthService {
       const hashedPassword = await hashPassword(user.password);
       user.password = hashedPassword;
       const userEntity = await this.userRepository.create(user);
-      await this.userRepository.save(userEntity);
+      const savedEntity = await this.userRepository.save(userEntity);
       return {
-        id: user.id,
-        userName: user.userName
+        id: savedEntity.id,
+        userName: savedEntity.userName
       }
     } catch (err) {
       if (err.code == 23505) {

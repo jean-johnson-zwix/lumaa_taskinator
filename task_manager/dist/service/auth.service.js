@@ -46,7 +46,11 @@ let AuthService = class AuthService {
             const hashedPassword = await (0, auth_util_1.hashPassword)(user.password);
             user.password = hashedPassword;
             const userEntity = await this.userRepository.create(user);
-            return await this.userRepository.save(userEntity);
+            const savedEntity = await this.userRepository.save(userEntity);
+            return {
+                id: savedEntity.id,
+                userName: savedEntity.userName
+            };
         }
         catch (err) {
             if (err.code == 23505) {

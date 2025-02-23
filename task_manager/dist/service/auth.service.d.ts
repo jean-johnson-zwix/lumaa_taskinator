@@ -1,4 +1,3 @@
-import { UserEntity } from 'src/entity/user.entity';
 import { DataSource } from 'typeorm';
 import { User } from 'src/model/user.model';
 import { AuthResponse } from 'src/model/auth.response.model';
@@ -10,6 +9,9 @@ export declare class AuthService {
     private logger;
     constructor(dataSource: DataSource, jwtService: JwtService);
     authenticate(authHeader: string): any;
-    registerUser(user: User): Promise<UserEntity>;
+    registerUser(user: User): Promise<{
+        id: any;
+        userName: any;
+    }>;
     loginUser(user: User): Promise<AuthResponse>;
 }
