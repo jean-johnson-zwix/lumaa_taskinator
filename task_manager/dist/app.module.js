@@ -13,17 +13,16 @@ const app_service_1 = require("./service/app.service");
 const task_controller_1 = require("./controller/task.controller");
 const datasource_module_1 = require("./datasource/datasource.module");
 const task_service_1 = require("./service/task.service");
-const users_service_1 = require("./service/users.service");
-const user_controller_1 = require("./controller/user.controller");
+const auth_service_1 = require("./service/auth.service");
+const auth_controller_1 = require("./controller/auth.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [datasource_module_1.TypeOrmModule],
-        controllers: [app_controller_1.AppController, task_controller_1.TaskController, user_controller_1.UserController],
-        providers: [app_service_1.AppService, users_service_1.UserService, task_service_1.TaskService
-        ],
+        controllers: [app_controller_1.AppController, task_controller_1.TaskController, auth_controller_1.AuthController],
+        providers: [app_service_1.AppService, auth_service_1.AuthService, task_service_1.TaskService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

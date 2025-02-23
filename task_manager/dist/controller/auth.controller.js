@@ -12,39 +12,39 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserController = void 0;
+exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const user_model_1 = require("../model/user.model");
-const users_service_1 = require("../service/users.service");
-let UserController = class UserController {
-    userService;
-    constructor(userService) {
-        this.userService = userService;
+const auth_service_1 = require("../service/auth.service");
+let AuthController = class AuthController {
+    authService;
+    constructor(authService) {
+        this.authService = authService;
     }
-    async signIn(user) {
-        return await this.userService.verifyUser(user);
+    async login(user) {
+        return await this.authService.loginUser(user);
     }
-    async signUp(user) {
-        return await this.userService.createUser(user);
+    async register(user) {
+        return await this.authService.registerUser(user);
     }
 };
-exports.UserController = UserController;
+exports.AuthController = AuthController;
 __decorate([
-    (0, common_1.Post)('/signin'),
+    (0, common_1.Post)('/login'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_model_1.User]),
     __metadata("design:returntype", Promise)
-], UserController.prototype, "signIn", null);
+], AuthController.prototype, "login", null);
 __decorate([
-    (0, common_1.Post)('/signup'),
+    (0, common_1.Post)('/register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_model_1.User]),
     __metadata("design:returntype", Promise)
-], UserController.prototype, "signUp", null);
-exports.UserController = UserController = __decorate([
-    (0, common_1.Controller)('users'),
-    __metadata("design:paramtypes", [users_service_1.UserService])
-], UserController);
-//# sourceMappingURL=user.controller.js.map
+], AuthController.prototype, "register", null);
+exports.AuthController = AuthController = __decorate([
+    (0, common_1.Controller)('auth'),
+    __metadata("design:paramtypes", [auth_service_1.AuthService])
+], AuthController);
+//# sourceMappingURL=auth.controller.js.map

@@ -9,13 +9,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
+exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const user_entity_1 = require("../entity/user.entity");
 const typeorm_1 = require("typeorm");
 const common_2 = require("@nestjs/common");
 const auth_response_model_1 = require("../model/auth.response.model");
-let UserService = class UserService {
+const auth_util_1 = require("../util/auth.util");
+let AuthService = class AuthService {
     dataSource;
     userRepository;
     logger = new common_2.Logger();
@@ -23,8 +24,10 @@ let UserService = class UserService {
         this.dataSource = dataSource;
         this.userRepository = this.dataSource.getRepository(user_entity_1.UserEntity);
     }
-    async createUser(user) {
+    async registerUser(user) {
         try {
+            const hashedPassword = await (0, auth_util_1.hashPassword)(user.password);
+            user.password = hashedPassword;
             const userEntity = await this.userRepository.create(user);
             return await this.userRepository.save(userEntity);
         }
@@ -37,18 +40,18 @@ let UserService = class UserService {
             throw new common_2.InternalServerErrorException('Something went wrong, Try again!');
         }
     }
-    async verifyUser(user) {
+    async loginUser(user) {
         try {
             const userName = user.userName;
             const userEntity = await this.userRepository.findOneBy({ userName });
             if (userEntity == null) {
-                throw new common_2.HttpException("User not found", 404);
+                throw new common_2.HttpException('User not found', 404);
             }
-            if (userEntity.password == user.password) {
-                return new auth_response_model_1.AuthResponse("Authorized", user.userName, userEntity.id);
+            if (await (0, auth_util_1.verifyPassword)(user.password, userEntity.password)) {
+                return new auth_response_model_1.AuthResponse('Authorized', user.userName, userEntity.id);
             }
             else {
-                throw new common_2.HttpException('Incorrect username or passworc', common_2.HttpStatus.UNAUTHORIZED);
+                throw new common_2.HttpException('Incorrect username or password', common_2.HttpStatus.UNAUTHORIZED);
             }
         }
         catch (err) {
@@ -57,9 +60,9 @@ let UserService = class UserService {
         }
     }
 };
-exports.UserService = UserService;
-exports.UserService = UserService = __decorate([
+exports.AuthService = AuthService;
+exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [typeorm_1.DataSource])
-], UserService);
-//# sourceMappingURL=users.service.js.map
+], AuthService);
+//# sourceMappingURL=auth.service.js.map
